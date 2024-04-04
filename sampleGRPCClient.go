@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pb "blogApp/protos" // Import the generated protobuf code
+	pb "blogApp/protos"
 
 	"google.golang.org/grpc"
 )
@@ -22,7 +22,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// Example: Create Post
+	// Create Post
 	createResponse, err := c.CreatePost(ctx, &pb.Post{
 		Title:           "Example Post",
 		Content:         "This is an example post content.",
@@ -35,6 +35,7 @@ func main() {
 	}
 	fmt.Printf("Created Post: %+v\n", createResponse)
 
+	// Create Post2
 	createResponse2, err2 := c.CreatePost(ctx, &pb.Post{
 		Title:           "New Post",
 		Content:         "Coming Soon.",
@@ -47,21 +48,21 @@ func main() {
 	}
 	fmt.Printf("Created Post: %+v\n", createResponse2)
 
-	// Example: Read Post
+	// Read Post1
 	readResponse, err := c.ReadPost(ctx, &pb.PostID{PostId: createResponse.GetPostId()})
 	if err != nil {
 		log.Fatalf("could not read post: %v", err)
 	}
 	fmt.Printf("Read Post: %+v\n", readResponse)
 
-	// Example: Read Post
+	// Read Post2
 	readResponse2, err := c.ReadPost(ctx, &pb.PostID{PostId: createResponse2.GetPostId()})
 	if err != nil {
 		log.Fatalf("could not read post: %v", err)
 	}
 	fmt.Printf("Read Post: %+v\n", readResponse2)
 
-	// Example: Update Post
+	// Update Post1
 	updateResponse, err := c.UpdatePost(ctx, &pb.Post{
 		PostId:          createResponse.GetPostId(),
 		Title:           "Updated Example Post",
@@ -75,7 +76,7 @@ func main() {
 	}
 	fmt.Printf("Updated Post: %+v\n", updateResponse)
 
-	// Example: Delete Post
+	// Example: Delete Post1
 	deleteResponse, err := c.DeletePost(ctx, &pb.PostID{PostId: createResponse.GetPostId()})
 	if err != nil {
 		log.Fatalf("could not delete post: %v", err)

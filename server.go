@@ -18,15 +18,7 @@ type server struct {
 	//pb.mustEmbedUnimplementedBlogServiceServer
 }
 
-/*type PostDetails struct {
-	PostId          int64    `protobuf:"varint,1,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
-	Title           string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Content         string   `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Author          string   `protobuf:"bytes,4,opt,name=author,proto3" json:"author,omitempty"`
-	PublicationDate string   `protobuf:"bytes,5,opt,name=publication_date,json=publicationDate,proto3" json:"publication_date,omitempty"`
-	Tags            []string `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
-}*/
-
+// Creates new Blog
 func (s *server) CreatePost(ctx context.Context, in *pb.Post) (*pb.Post, error) {
 	postID := rand.Intn(101)
 	in.PostId = int64(postID)
@@ -34,6 +26,7 @@ func (s *server) CreatePost(ctx context.Context, in *pb.Post) (*pb.Post, error) 
 	return in, nil
 }
 
+// For Reading Current Blog using PostID
 func (s *server) ReadPost(ctx context.Context, in *pb.PostID) (*pb.Post, error) {
 	post, ok := s.posts[in.GetPostId()]
 	if !ok {
@@ -42,6 +35,7 @@ func (s *server) ReadPost(ctx context.Context, in *pb.PostID) (*pb.Post, error) 
 	return post, nil
 }
 
+// Updates already existing Post's Details if PostID in request exists
 func (s *server) UpdatePost(ctx context.Context, in *pb.Post) (*pb.Post, error) {
 	_, ok := s.posts[in.GetPostId()]
 	if !ok {
@@ -51,6 +45,7 @@ func (s *server) UpdatePost(ctx context.Context, in *pb.Post) (*pb.Post, error) 
 	return in, nil
 }
 
+// For Deleting Current Blog using PostID
 func (s *server) DeletePost(ctx context.Context, in *pb.PostID) (*pb.DeleteResponse, error) {
 	_, ok := s.posts[in.GetPostId()]
 	if !ok {
@@ -60,13 +55,22 @@ func (s *server) DeletePost(ctx context.Context, in *pb.PostID) (*pb.DeleteRespo
 	return &pb.DeleteResponse{Success: true}, nil
 }
 
+const (
+	listenerPort = ":9090"
+)
+
+// start listening on a port
+// Hosts a GRPC API
 func main() {
-	lis, err := net.Listen("tcp", ":9090")
+	lis, err := net.Listen("tcp", listenerPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	s := grpc.NewServer()
+
 	pb.RegisterBlogServiceServer(s, &server{posts: make(map[int64]*pb.Post)})
+
 	fmt.Println("Server listening on port 9090")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
